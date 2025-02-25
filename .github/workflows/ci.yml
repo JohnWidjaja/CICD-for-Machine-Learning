@@ -1,24 +1,38 @@
 name: Continuous Integration
+
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
-  
+
 permissions: write-all
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      # Set up CML if needed
       - uses: iterative/setup-cml@v2
+
+      # Install packages (including black)
       - name: Install Packages
-        run: make install
+        run: |
+          make install
+          pip install black  # Ensure black is installed here
+
+      # Format code (black will now be available)
       - name: Format
         run: make format
+
+      # Train the model
       - name: Train
         run: make train
+
+      # Evaluate the model
       - name: Evaluation
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
